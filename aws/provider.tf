@@ -1,13 +1,38 @@
 # Configure the AWS Provider
 provider "aws" {
-  region     = "us-west-1"
+  region     = "us-east-1"
 }
+
+# Declare the data source
+data "aws_availability_zones" "available" {}
 
 # Configure the key pair to connect to the instances
 
 resource "aws_key_pair" "terraform" {
   key_name   = "terraform_key"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAsqGEs3sYjBOHHz+SKb4GOTltfPOy1bNOdfs+3KeVb9gTkOEXqEdxC2Q5QMaM1m9D5tF3526tusxUQAn6gpW6R5s67CWJtKLbUjIx4bduVMO8izU6f6aXsNjS29RtvKzRbeUpfXX5Q3xOTmpH+KUf6tEEA99+JWqDrVKmibEbgXxiEEDT4Y+HRVTD9pd/8mFWQChF6Zl3dqZm7/cVS6O/n9AklZyPcQEd+xjN7aIEVhNiwG0gC0J4B+pmBS0Zebld96TA65TmjLRwIMRtEI4Pz6/Ooc0o0Fh/UeMcBXdm0idlgmMpxD9cSIglBsBM4mMVjTH9rUp9I5UOkK7uJQOHyw== vnaray001c@res3parsr-ch2-01.sys.comcast.net"
+  public_key = "${var.tfkeys["pubkey_prod"]}"
+}
+
+# Configure VPC
+
+resource "aws_vpc" "vpc_prd_a" {
+  cidr_block = "${var.vpc_prdnet_a}"
+}
+
+resource "aws_vpc" "vpc_prd_b" {
+  cidr_block = "${var.vpc_prdnet_b}"
+}
+
+resource "aws_subnet" "prdnet1_a" {
+  vpc_id = "${aws_vpc.vpc_prd_a.id}"
+  availability_zone = "${data.aws_availability_zones.available.names[0]}"
+  cidr_block = "${var.prdnet1_a}"
+}
+
+resource "aws_subnet" "prdnet2_a" {
+  vpc_id = "${aws_vpc.vpc_prd_a.id}"
+  availability_zone = "${data.aws_availability_zones.available.names[1]}"
+  cidr_block = "${var.prdnet2_a}"
 }
 
 # Configure security groups
