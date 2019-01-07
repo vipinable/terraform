@@ -1,0 +1,28 @@
+- hosts: all
+  gather_facts: False
+  tasks:
+  - name: Wait for instance to become active
+    local_action:
+      module: wait_for
+      port: 22
+      host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
+      search_regex: OpenSSH
+      delay: 30
+
+  - name: Configure hostname
+    hostname: 
+      name: "{{ hostname }}"
+
+  - name: Reboot the instance to update all configs
+    command: shutdown -r 0
+    async: 0
+    poll: 0
+    ignore_errors: true
+
+  - name: Wait for instance to become active
+    local_action:
+      module: wait_for
+      port: 22
+      host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
+      search_regex: OpenSSH
+      delay: 60

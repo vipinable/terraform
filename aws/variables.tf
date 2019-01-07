@@ -26,7 +26,7 @@ variable "prdnet1_b" {
   type    = "string"
   default = "10.193.1.0/24"
 }
-variable "prdnetr2_b" {
+variable "prdnet2_b" {
   type    = "string"
   default = "10.193.2.0/24"
 }
